@@ -1,0 +1,16 @@
+{
+  "name": "socket.io-ap-attack",
+  "version": "0.0.0",
+  "description": "Sockets for AP Attack Gameplay",
+  "main": "index.js",
+  "author": "Michael Gu",
+  "private": true,
+  "license": "BSD",
+  "dependencies": {
+    "express": "3.4.8",
+    "socket.io": "latest"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
