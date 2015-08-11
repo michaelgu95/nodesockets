@@ -2,10 +2,9 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('../..')(server);
+var io = require('socket.io').listen(server);
 var port = process.env.OPENSHIFT_NODJS_PORT || 3000;
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-
 
 
 server.listen(port, ipaddress, function () {
