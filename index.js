@@ -1,19 +1,14 @@
 // Setup basic express server
 var express = require('express');
 var app = express();
-
-var osipaddress = process.env.OPENSHIFT_NODEJS_IP;
-var osport = process.env.OPENSHIFT_NODEJS_PORT;
-app.set('port', osport || 3000);
-app.set('ipaddress', osipaddress);
-
 var server = require('http').createServer(app);
 var io = require('../..')(server);
 var port = process.env.OPENSHIFT_NODJS_PORT || 3000;
+var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 
 
 
-server.listen(port, function () {
+server.listen(port, ipaddress, function () {
   console.log('Server listening at port %d', port);
 });
 
