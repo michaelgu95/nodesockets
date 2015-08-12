@@ -4,10 +4,9 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var port = process.env.PORT|| 3000;
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 
 
-server.listen(port, ipaddress, function () {
+server.listen(port, function () {
   console.log('Server listening at port %d', port);
 });
 
@@ -19,7 +18,7 @@ app.use(express.static(__dirname + '/public'));
 // users trying to play
 var quickPlayUsers = new Array();
 
-io.on('connection', function(socket) {
+io.sockets.on('connection', function(socket) {
   var addedUser = false;
 
   //=== Create and Join sockets ===
