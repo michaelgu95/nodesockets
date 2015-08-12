@@ -57,7 +57,7 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('opponentQuit', function(data){
+  socket.on('quitMatch', function(data){
    io.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
   })
 
