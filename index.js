@@ -43,8 +43,8 @@ io.sockets.on('connection', function(socket) {
       while(index >= 0){
          var opponentData = quickPlayUsers[index];
          if(opponentData != data && opponentData.subject == data.subject){
-            io.to(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject});
-            io.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject});
+            io.to(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
+            io.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
             var userIndex = quickPlayUsers.indexOf(data);
             socket.leave(data.email);
             quickPlayUsers.splice(userIndex,1);
@@ -58,7 +58,7 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('quitMatch', function(data){
-   io.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
+    io.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
   })
 
 
