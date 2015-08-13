@@ -13,8 +13,6 @@ server.listen(port, function () {
 // Routing
 app.use(express.static(__dirname + '/public'));
 
-// Chatroom
-
 // users trying to play
 var quickPlayUsers = new Array();
 
@@ -59,6 +57,27 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('quitMatch', function(data){
     io.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
+  })
+
+  socket.on('finishedGame', function(data){
+    var opponentEmail = data.opponentEmail;
+    var userEmail = data.userEmail;
+    var firstUserDoneData = data;
+
+    userEmail.finished = true;
+    if(opponentEmail.finished == true){
+      io.to(opponentEmail).emit('opponentFinished', {score: data.score, wrongQuestions: data.wrongQuestions, rightQuestions: data.rightQuestions});
+    }else{
+      socket.emit('waitingForOpponent', {msg: 'Waiting For Opponent To Finish'});
+      while(!opponentEmail.finished){
+        socket.once('finishedGame', function(data){
+          if(data.opponentEmail = userEmail){
+              io.to(opponentEmail).emit('opponentFinished', {score: firstUserDoneData.score, wrongQuestions: firstUserDoneData.wrongQuestions, rightQuestions: firstUserDoneData.rightQuestions});
+          }
+        })
+      }
+    }
+    
   })
 
 
