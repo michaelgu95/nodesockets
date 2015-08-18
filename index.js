@@ -32,6 +32,8 @@ io.sockets.on('connection', function(socket) {
   })
 
 
+
+
   //=== Quick play sockets ===
   socket.on('findOpponent', function(data){
     socket.join(data.email);
@@ -47,8 +49,7 @@ io.sockets.on('connection', function(socket) {
             socket.emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
             socket.broadcast.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
             var userIndex = quickPlayUsers.indexOf(data);
-            // socket.leave(data.email);
-            // socket.leave(opponentData.email);
+            
             quickPlayUsers.splice(userIndex,1);
             quickPlayUsers.splice(index,1);
             console.log(quickPlayUsers);
@@ -62,6 +63,8 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('quitMatch', function(data){
     socket.broadcast.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
+    socket.leave(data.email);
+    socket.leave(opponentData.email);
   })
 
   socket.on('finishedGame', function(data){
@@ -72,7 +75,6 @@ io.sockets.on('connection', function(socket) {
     var user = data.user;
 
     //save the data to the user, containing right/wrong questions and user's score
-    
     finishedUsers[userEmail] = data; 
     console.log(finishedUsers);
     //check if opponent has finished by seeing if it exists in finishedUsers array
@@ -87,13 +89,11 @@ io.sockets.on('connection', function(socket) {
       socket.leave(data.email);
     }else{
       socket.emit('opponentStatus', {msg: 'Waiting'});
-      // while(!opponentEmail.finished){
-      //   socket.once('finishedGame', function(data){
-      //     if(data.opponentEmail = userEmail){  
-      //         io.to(opponentEmail).emit('opponentFinished', {score: firstUserDoneData.score, wrongQuestions: firstUserDoneData.wrongQuestions, rightQuestions: firstUserDoneData.rightQuestions});
-      //     }`
-      //   })
-      // }
     }
   })
+
+  socket.on('leaveRoom', function(data){
+    socket.leave(data.email);
+  })
+  
 });
