@@ -32,8 +32,6 @@ io.sockets.on('connection', function(socket) {
   })
 
 
-
-
   //=== Quick play sockets ===
   socket.on('findOpponent', function(data){
     socket.join(data.email);
@@ -68,7 +66,7 @@ io.sockets.on('connection', function(socket) {
   })
 
   socket.on('finishedGame', function(data){
-    socket.join(userEmail);
+    // socket.join(userEmail);
     var opponentEmail = data.opponentEmail;
     var userEmail = data.userEmail;
     var opponent = data.opponent;
@@ -85,6 +83,12 @@ io.sockets.on('connection', function(socket) {
 
       //report to opponent that user is done
       socket.broadcast.to(opponentEmail).emit('opponentFinished', {score: data.score, wrongQuestions: data.wrongQuestions, rightQuestions: data.rightQuestions});
+
+      //remove user and opponent from finishedUsers array, remove them from socket.io rooms
+      var userIndex = finishedUsers.indexOf(data);
+      var opponentIndex = finishedUsers.indexOf(finishedOpponentData);
+      finishedUsers.splice(userIndex, 1);
+      finishedUsers.splice(opponentIndex, 1);
       socket.leave(userEmail);
       socket.leave(data.email);
     }else{
@@ -95,5 +99,5 @@ io.sockets.on('connection', function(socket) {
   socket.on('leaveRoom', function(data){
     socket.leave(data.email);
   })
-  
+
 });
