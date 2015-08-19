@@ -61,8 +61,8 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('quitMatch', function(data){
     socket.broadcast.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
-    socket.leave(data.email);
-    socket.leave(opponentData.email);
+    socket.leave(data.userEmail);
+    socket.leave(data.opponentEmail);
   })
 
   socket.on('finishedGame', function(data){
