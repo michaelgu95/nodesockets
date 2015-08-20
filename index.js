@@ -60,9 +60,15 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('quitMatch', function(data){
-    socket.broadcast.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
-    socket.leave(data.userEmail);
-    socket.leave(data.opponentEmail);
+    io.sockets.in(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
+    //clear the rooms
+    io.sockets.clients(data.userEmail).forEach(function(s){
+      s.leave(data.userEmail);
+    });
+
+    io.sockets.clients(data.opponentEmail)).forEach(function(s){
+      s.leave(data.userEmail);
+    });
   })
 
   socket.on('finishedGame', function(data){
@@ -89,8 +95,15 @@ io.sockets.on('connection', function(socket) {
       var opponentIndex = finishedUsers.indexOf(finishedOpponentData);
       finishedUsers.splice(userIndex, 1);
       finishedUsers.splice(opponentIndex, 1);
-      socket.leave(userEmail);
-      socket.leave(data.email);
+
+      //clear the rooms
+      io.sockets.clients(data.userEmail).forEach(function(s){
+        s.leave(data.userEmail);
+      });
+
+      io.sockets.clients(data.opponentEmail)).forEach(function(s){
+        s.leave(data.userEmail);
+      });
     }else{
       socket.emit('opponentStatus', {msg: 'Waiting'});
     }
