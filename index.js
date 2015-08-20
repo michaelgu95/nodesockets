@@ -36,7 +36,7 @@ io.sockets.on('connection', function(socket) {
   socket.on('findOpponent', function(data){
     socket.join(data.email);
     quickPlayUsers.push(data);
-    console.log(quickPlayUsers);
+    // console.log(quickPlayUsers);
 
     if(quickPlayUsers.length >1){
       var index = quickPlayUsers.length -1;
@@ -61,9 +61,8 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('quitMatch', function(data){
     io.sockets.in(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
-    //clear the rooms
-    io.sockets.in(data.userEmail).leave(data.userEmail);
-    io.sockets.in(data.opponentEmail).leave(data.opponentEmail);
+    socket.leave(data.userEmail);
+    socket.leave(data.opponentEmail);
   })
 
   socket.on('finishedGame', function(data){
@@ -83,18 +82,18 @@ io.sockets.on('connection', function(socket) {
       io.sockets.in(userEmail).emit('opponentStatus', {msg:'Finished', opponentData: finishedOpponentData});
 
       //report to opponent that user is done
-      io.sockets.in(opponentEmail).emit('opponentFinished', {score: data.score, wrongQuestions: data.wrongQuestions, rightQuestions: data.rightQuestions});
+      io.sockets.to(opponentEmail).emit('opponentFinished', {score: data.score, wrongQuestions: data.wrongQuestions, rightQuestions: data.rightQuestions});
 
       //remove user and opponent from finishedUsers array, remove them from socket.io rooms
-      var userIndex = finishedUsers.indexOf(data);
-      var opponentIndex = finishedUsers.indexOf(finishedOpponentData);
-      finishedUsers.splice(userIndex, 1);
-      finishedUsers.splice(opponentIndex, 1);
-
-      //clear the rooms
-      io.sockets.in(userEmail).leave(data.userEmail);
-      io.sockets.in(opponentEmail).leave(data.opponentEmail);
-
+      // var userIndex = finishedUsers.indexOf(data);
+      // var opponentIndex = finishedUsers.indexOf(finishedOpponentData);
+      // finishedUsers.splice(userIndex, 1);
+      // finishedUsers.splice(opponentIndex, 1);
+      delete finishedUsers[userEmail];
+      delete finishedUsers[opponentEmail];
+      console.log(finishedUsers);
+      socket.leave(userEmail);
+      socket.leave(data.email);
     }else{
       socket.emit('opponentStatus', {msg: 'Waiting'});
     }
