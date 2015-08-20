@@ -44,8 +44,8 @@ io.sockets.on('connection', function(socket) {
       while(index >= 0){
          var opponentData = quickPlayUsers[index];
          if(opponentData !== data && opponentData.subject == data.subject){
-            socket.broadcast.to(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
-            socket.broadcast.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
+            io.sockets.in(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
+            io.sockets.in(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
             var userIndex = quickPlayUsers.indexOf(data);
             
             quickPlayUsers.splice(userIndex,1);
@@ -79,10 +79,10 @@ io.sockets.on('connection', function(socket) {
     if(opponentEmail in finishedUsers){
       //report back to user that opponent finished
       var finishedOpponentData = finishedUsers[opponentEmail];
-      socket.broadcast.to(userEmail).emit('opponentStatus', {msg:'Finished', opponentData: finishedOpponentData});
+      io.sockets.in(userEmail).emit('opponentStatus', {msg:'Finished', opponentData: finishedOpponentData});
 
       //report to opponent that user is done
-      socket.broadcast.to(opponentEmail).emit('opponentFinished', {score: data.score, wrongQuestions: data.wrongQuestions, rightQuestions: data.rightQuestions});
+      io.sockets.in(opponentEmail).emit('opponentFinished', {score: data.score, wrongQuestions: data.wrongQuestions, rightQuestions: data.rightQuestions});
 
       //remove user and opponent from finishedUsers array, remove them from socket.io rooms
       var userIndex = finishedUsers.indexOf(data);
