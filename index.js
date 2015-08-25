@@ -22,7 +22,7 @@ io.sockets.on('connection', function(socket) {
 
   //=== Create and Join sockets ===
   socket.on('join', function(data) {
-    socket.join(data.email); // We are using room of socket io
+    socket.join(data.email); 
   });
 
   socket.on('joinGame', function(data){
@@ -36,18 +36,15 @@ io.sockets.on('connection', function(socket) {
   socket.on('findOpponent', function(data){
     socket.join(data.email);
     quickPlayUsers.push(data);
-    // console.log(quickPlayUsers);
-
     if(quickPlayUsers.length >1){
       var index = quickPlayUsers.length -1;
       dance:
       while(index >= 0){
          var opponentData = quickPlayUsers[index];
-         if(opponentData !== data && opponentData.subject == data.subject){
+         if(opponentData.email !== data.email && opponentData.subject == data.subject){
             io.sockets.in(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
             socket.broadcast.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
             var userIndex = quickPlayUsers.indexOf(data);
-            
             quickPlayUsers.splice(userIndex,1);
             quickPlayUsers.splice(index,1);
             console.log(quickPlayUsers);
@@ -85,10 +82,6 @@ io.sockets.on('connection', function(socket) {
       io.sockets.to(opponentEmail).emit('opponentFinished', {score: data.score, wrongQuestions: data.wrongQuestions, rightQuestions: data.rightQuestions});
 
       //remove user and opponent from finishedUsers array, remove them from socket.io rooms
-      // var userIndex = finishedUsers.indexOf(data);
-      // var opponentIndex = finishedUsers.indexOf(finishedOpponentData);
-      // finishedUsers.splice(userIndex, 1);
-      // finishedUsers.splice(opponentIndex, 1);
       delete finishedUsers[userEmail];
       delete finishedUsers[opponentEmail];
       console.log(finishedUsers);
