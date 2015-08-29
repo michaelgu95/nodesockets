@@ -42,7 +42,7 @@ io.sockets.on('connection', function(socket) {
       while(index >= 0){
          var opponentData = quickPlayUsers[index];
          if(opponentData.email !== data.email && opponentData.subject == data.subject){
-            io.sockets.in(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
+            socket.broadcast.to(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
             socket.broadcast.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
             var userIndex = quickPlayUsers.indexOf(data);
             quickPlayUsers.splice(userIndex,1);
