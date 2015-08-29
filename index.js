@@ -18,18 +18,18 @@ var quickPlayUsers = new Array();
 var finishedUsers = new Array();
 
 io.sockets.on('connection', function(socket) {
-  var addedUser = false;
+  // var addedUser = false;
 
-  //=== Create and Join sockets ===
-  socket.on('join', function(data) {
-    socket.join(data.email); 
-  });
+  // //=== Create and Join sockets ===
+  // // socket.on('join', function(data) {
+  // //   socket.join(data.email); 
+  // // });
 
-  socket.on('joinGame', function(data){
+  // socket.on('joinGame', function(data){
 
-    //TODO change game room to variable 
-    io.to('jsmith@gmail.com').emit('userJoined', {msg: 'User Joined Game', game:data.game, user:data.user});
-  })
+  //   //TODO change game room to variable 
+  //   io.to('jsmith@gmail.com').emit('userJoined', {msg: 'User Joined Game', game:data.game, user:data.user});
+  // })
 
 
   //=== Quick play sockets ===
@@ -42,7 +42,7 @@ io.sockets.on('connection', function(socket) {
       while(index >= 0){
          var opponentData = quickPlayUsers[index];
          if(opponentData.email !== data.email && opponentData.subject == data.subject){
-            socket.broadcast.to(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
+            io.sockets.in(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
             socket.broadcast.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
             var userIndex = quickPlayUsers.indexOf(data);
             quickPlayUsers.splice(userIndex,1);
@@ -57,7 +57,7 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('quitMatch', function(data){
-    io.sockets.in(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
+    socket.broadcast.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
     socket.leave(data.userEmail);
     socket.leave(data.opponentEmail);
   })
