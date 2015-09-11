@@ -16,8 +16,11 @@ app.use(express.static(__dirname + '/public'));
 // users trying to play
 var quickPlayUsers = new Array();
 var finishedUsers = new Array();
+var roomClients = {};
+
 
 io.sockets.on('connection', function(socket) {
+  var joinedRoom = false;
   // var addedUser = false;
 
   // //=== Create and Join sockets ===
@@ -33,17 +36,36 @@ io.sockets.on('connection', function(socket) {
 
 
   //=== Quick play sockets ===
+  if(!joinedRoom){
+  joinedRoom = true;
   socket.on('findOpponent', function(data){
+    var clients = io.sockets.adapter.rooms[data.email];
+    console.log(clients);
+   if(roomClients[data.email] == true && clients !== undefined){
+     
+   }else{
     socket.join(data.email);
     quickPlayUsers.push(data);
-    if(quickPlayUsers.length >1){
+    // console.log(quickPlayUsers);
+    roomClients[data.email] = true;
+    console.log(roomClients);
+   }
+      
+    
+    if(quickPlayUsers.length > 0){
       var index = quickPlayUsers.length -1;
       dance:
       while(index >= 0){
          var opponentData = quickPlayUsers[index];
          if(opponentData.email !== data.email && opponentData.subject == data.subject){
-            io.sockets.in(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
-            socket.broadcast.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
+
+              if(roomClients[data.email] == true){
+                io.sockets.to(data.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:opponentData.email, subject:data.subject, opponent:opponentData.user});
+              }
+              if(roomClients[opponentData.email] == true){
+                io.sockets.to(opponentData.email).emit('opponentFound', {msg: 'Opponent Found!', opponentEmail:data.email, subject:data.subject, opponent:data.user});
+              }
+
             var userIndex = quickPlayUsers.indexOf(data);
             quickPlayUsers.splice(userIndex,1);
             quickPlayUsers.splice(index,1);
@@ -55,9 +77,10 @@ io.sockets.on('connection', function(socket) {
       }
     }
   });
+  }
 
   socket.on('quitMatch', function(data){
-    socket.broadcast.to(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
+    io.sockets.in(data.opponentEmail).emit('opponentQuit', {msg:'Your Opponent Forfeited the Match'});
     socket.leave(data.userEmail);
     socket.leave(data.opponentEmail);
   })
@@ -94,6 +117,14 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('leaveRoom', function(data){
     socket.leave(data.email);
+    socket.emit('leftRoomOnce', {});
+    var userIndex = quickPlayUsers.indexOf(data);
+    quickPlayUsers.splice(userIndex,1);
+    // console.log(quickPlayUsers);
+    roomClients[data.email] = false;
+    delete roomClients[data.email];
+    var clients = io.sockets.adapter.rooms[data.email];
+    console.log(roomClients);
   })
 
 });
