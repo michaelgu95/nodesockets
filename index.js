@@ -21,18 +21,6 @@ var roomClients = {};
 
 io.sockets.on('connection', function(socket) {
   var joinedRoom = false;
-  // var addedUser = false;
-
-  // //=== Create and Join sockets ===
-  // // socket.on('join', function(data) {
-  // //   socket.join(data.email); 
-  // // });
-
-  // socket.on('joinGame', function(data){
-
-  //   //TODO change game room to variable 
-  //   io.to('jsmith@gmail.com').emit('userJoined', {msg: 'User Joined Game', game:data.game, user:data.user});
-  // })
 
 
   //=== Quick play sockets ===
@@ -46,7 +34,6 @@ io.sockets.on('connection', function(socket) {
    }else{
     socket.join(data.email);
     quickPlayUsers.push(data);
-    // console.log(quickPlayUsers);
     roomClients[data.email] = true;
     console.log(roomClients);
    }
@@ -120,7 +107,6 @@ io.sockets.on('connection', function(socket) {
     socket.emit('leftRoomOnce', {});
     var userIndex = quickPlayUsers.indexOf(data);
     quickPlayUsers.splice(userIndex,1);
-    // console.log(quickPlayUsers);
     roomClients[data.email] = false;
     delete roomClients[data.email];
     var clients = io.sockets.adapter.rooms[data.email];
