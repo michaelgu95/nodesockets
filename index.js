@@ -38,7 +38,6 @@ io.sockets.on('connection', function(socket) {
     console.log(roomClients);
    }
       
-    
     if(quickPlayUsers.length > 0){
       var index = quickPlayUsers.length -1;
       dance:
